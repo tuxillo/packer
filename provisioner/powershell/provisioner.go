@@ -397,7 +397,7 @@ func (p *Provisioner) uploadEnvVars(flattenedEnvVars string) (envVarPath string,
 	// Upload all env vars to a powershell script on the target build file system
 	envVarReader := strings.NewReader(flattenedEnvVars)
 	uuid := uuid.TimeOrderedUUID()
-	envVarPath = fmt.Sprintf(`${env:SYSTEMROOT}\Temp\packer-env-vars-%s.ps1`, uuid)
+	envVarPath = fmt.Sprintf(`${env:SYSTEMROOT}/Temp/packer-env-vars-%s.ps1`, uuid)
 	log.Printf("Uploading env vars to %s", envVarPath)
 	err = p.communicator.Upload(envVarPath, envVarReader, nil)
 	if err != nil {
