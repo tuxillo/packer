@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/hashicorp/packer/builder/vmware/iso"
 	"github.com/hashicorp/packer/common"
@@ -100,10 +99,23 @@ func (p *PostProcessor) PostProcess(ui packer.Ui, artifact packer.Artifact) (pac
 		return nil, false, errors.New("To use this post-processor with exporting behavior you need set keep_registered as true")
 	}
 
-	// In some occasions the VM state is powered on and if we immediately try to mark as template
-	// (after the ESXi creates it) it will fail. If vSphere is given a few seconds this behavior doesn't reappear.
-	ui.Message("Waiting 10s for VMware vSphere to start")
-	time.Sleep(10 * time.Second)
+	// In some occasions the VM state is powered on and if we immediately try
+	// to mark as template (after the ESXi creates it) it will fail.
+	// Work around this by retrying a few times, up to about 5 minutes.
+	err := common.Retry(2, 10, 30, func(i uint) (bool, error) {
+		ui.Message(fmt.Sprintf("Creating VSphere client, attempt %d", i+1))
+
+		_, err := govmomi.NewClient(context.Background(), p.url, p.config.Insecure)
+		if err == nil {
+			// success
+			return true, nil
+		}
+		ui.Message(fmt.Sprintf("Error connecting to Vsphere; will retry..."+
+			"Error: %s", err.Error()))
+		// retry
+		return false, nil
+	})
+	// Now we know that we can create the client. Do it for real this time.
 	c, err := govmomi.NewClient(context.Background(), p.url, p.config.Insecure)
 	if err != nil {
 		return nil, false, fmt.Errorf("Error connecting to vSphere: %s", err)
