@@ -78,6 +78,7 @@ type Config struct {
 	VlanId                         string   `mapstructure:"vlan_id"`
 	Cpu                            uint     `mapstructure:"cpu"`
 	Generation                     uint     `mapstructure:"generation"`
+	NetworkLegacy                  bool     `mapstructure:"network_legacy"`
 	EnableMacSpoofing              bool     `mapstructure:"enable_mac_spoofing"`
 	EnableDynamicMemory            bool     `mapstructure:"enable_dynamic_memory"`
 	EnableSecureBoot               bool     `mapstructure:"enable_secure_boot"`
@@ -354,6 +355,7 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 			DiskSize:                       b.config.DiskSize,
 			Generation:                     b.config.Generation,
 			Cpu:                            b.config.Cpu,
+			NetworkLegacy:                  b.config.NetworkLegacy,
 			EnableMacSpoofing:              b.config.EnableMacSpoofing,
 			EnableDynamicMemory:            b.config.EnableDynamicMemory,
 			EnableSecureBoot:               b.config.EnableSecureBoot,

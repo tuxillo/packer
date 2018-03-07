@@ -23,6 +23,7 @@ type StepCreateVM struct {
 	DiskSize                       uint
 	Generation                     uint
 	Cpu                            uint
+	NetworkLegacy                  bool
 	EnableMacSpoofing              bool
 	EnableDynamicMemory            bool
 	EnableSecureBoot               bool
@@ -65,7 +66,7 @@ func (s *StepCreateVM) Run(_ context.Context, state multistep.StateBag) multiste
 	ramSize := int64(s.RamSize * 1024 * 1024)
 	diskSize := int64(s.DiskSize * 1024 * 1024)
 
-	err := driver.CreateVirtualMachine(s.VMName, path, harddrivePath, vhdPath, ramSize, diskSize, s.SwitchName, s.Generation, s.DifferencingDisk)
+	err := driver.CreateVirtualMachine(s.VMName, path, harddrivePath, vhdPath, ramSize, diskSize, s.NetworkLegacy, s.SwitchName, s.Generation, s.DifferencingDisk)
 	if err != nil {
 		err := fmt.Errorf("Error creating virtual machine: %s", err)
 		state.Put("error", err)
